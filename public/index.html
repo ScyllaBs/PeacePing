@@ -1,40 +1,457 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-  <title>CalmPing</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeacePing - Messages Programmés</title>
   <style>
-    body { font-family: Arial; max-width: 600px; margin: 20px auto; }
-    input, button { padding: 8px; margin: 5px 0; width: 100%; }
-    ul { padding-left: 20px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 1.1em;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .messages-list {
+      margin-top: 20px;
+    }
+
+    .message-item {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 4px solid #667eea;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .message-item.sent {
+      border-left-color: #28a745;
+      background: #d4edda;
+    }
+
+    .message-content {
+      flex: 1;
+    }
+
+    .message-text {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .message-date {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .message-status {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      margin-right: 10px;
+    }
+
+    .message-status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .message-status.sent {
+      background: #28a745;
+      color: white;
+    }
+
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+      width: auto;
+    }
+
+    .delete-btn:hover {
+      background: #c82333;
+      transform: none;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alert.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      flex: 1;
+    }
+
+    .stat-number {
+      font-size: 2em;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 2em;
+      }
+      
+      .stats {
+        flex-direction: column;
+      }
+      
+      .message-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .delete-btn {
+        margin-top: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>CalmPing</h1>
+  <div class="container">
+    <div class="header">
+      <h1>✉️ PeacePing</h1>
+      <p>Programme tes messages pour le futur</p>
+    </div>
 
-  <form action="/add" method="POST">
-    <input type="text" name="message" placeholder="Message" required>
-    <input type="datetime-local" name="date" required>
-    <button type="submit">Programmer le message</button>
-  </form>
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-number" id="totalCount">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="pendingCount">0</div>
+        <div class="stat-label">En attente</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number" id="sentCount">0</div>
+        <div class="stat-label">Envoyés</div>
+      </div>
+    </div>
 
-  <h2>Messages programmés :</h2>
-  <ul id="messagesList"></ul>
+    <div class="card">
+      <div id="alert" class="alert"></div>
+      
+      <form id="messageForm">
+        <div class="form-group">
+          <label for="email">📧 Email du destinataire</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            placeholder="exemple@email.com" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="message">💬 Message</label>
+          <textarea 
+            id="message" 
+            name="message" 
+            placeholder="Écris ton message ici..."
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="date">📅 Date et heure d'envoi</label>
+          <input 
+            type="datetime-local" 
+            id="date" 
+            name="date" 
+            required
+          >
+        </div>
+
+        <button type="submit">⏰ Programmer le message</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 20px;">📬 Messages programmés</h2>
+      <div id="messagesList" class="messages-list"></div>
+    </div>
+  </div>
 
   <script>
-    async function loadMessages() {
-      const res = await fetch('/messages');
-      const messages = await res.json();
-      const ul = document.getElementById('messagesList');
-      ul.innerHTML = '';
-      messages.forEach(msg => {
-        const li = document.createElement('li');
-        li.textContent = `${msg.date} - ${msg.message}`;
-        ul.appendChild(li);
-      });
+    const form = document.getElementById('messageForm');
+    const alertBox = document.getElementById('alert');
+    const messagesList = document.getElementById('messagesList');
+
+    // Définir la date min à maintenant
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('date').min = now.toISOString().slice(0, 16);
+
+    // Afficher une alerte
+    function showAlert(message, type) {
+      alertBox.textContent = message;
+      alertBox.className = `alert ${type} show`;
+      setTimeout(() => {
+        alertBox.className = 'alert';
+      }, 5000);
     }
 
+    // Soumettre le formulaire
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        email: document.getElementById('email').value,
+        message: document.getElementById('message').value,
+        date: document.getElementById('date').value
+      };
+
+      try {
+        const response = await fetch('/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert('✅ Message programmé avec succès !', 'success');
+          form.reset();
+          loadMessages();
+        } else {
+          showAlert('❌ ' + data.error, 'error');
+        }
+      } catch (error) {
+        showAlert('❌ Erreur lors de l\'envoi', 'error');
+      }
+    });
+
+    // Charger les messages
+    async function loadMessages() {
+      try {
+        const response = await fetch('/messages');
+        const messages = await response.json();
+
+        if (messages.length === 0) {
+          messagesList.innerHTML = `
+            <div class="empty-state">
+              <svg fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+              </svg>
+              <p>Aucun message programmé pour le moment</p>
+            </div>
+          `;
+        } else {
+          messagesList.innerHTML = messages
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .map(msg => {
+              const date = new Date(msg.date);
+              const formattedDate = date.toLocaleString('fr-FR');
+              const isSent = msg.sent;
+
+              return `
+                <div class="message-item ${isSent ? 'sent' : ''}">
+                  <div class="message-content">
+                    <div class="message-text">${escapeHtml(msg.message)}</div>
+                    <div class="message-date">
+                      📧 ${escapeHtml(msg.email)} • 📅 ${formattedDate}
+                    </div>
+                  </div>
+                  <span class="message-status ${isSent ? 'sent' : 'pending'}">
+                    ${isSent ? '✓ Envoyé' : '⏳ En attente'}
+                  </span>
+                  ${!isSent ? `<button class="delete-btn" onclick="deleteMessage(${msg.id})">🗑️</button>` : ''}
+                </div>
+              `;
+            }).join('');
+        }
+
+        updateStats(messages);
+      } catch (error) {
+        console.error('Erreur chargement messages:', error);
+      }
+    }
+
+    // Échapper le HTML pour éviter XSS
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Mettre à jour les stats
+    function updateStats(messages) {
+      const total = messages.length;
+      const pending = messages.filter(m => !m.sent).length;
+      const sent = messages.filter(m => m.sent).length;
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('pendingCount').textContent = pending;
+      document.getElementById('sentCount').textContent = sent;
+    }
+
+    // Supprimer un message
+    async function deleteMessage(id) {
+      if (!confirm('Supprimer ce message ?')) return;
+
+      try {
+        const response = await fetch(`/messages/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          showAlert('🗑️ Message supprimé', 'success');
+          loadMessages();
+        }
+      } catch (error) {
+        showAlert('❌ Erreur lors de la suppression', 'error');
+      }
+    }
+
+    // Charger au démarrage et rafraîchir toutes les 5 secondes
     loadMessages();
-    setInterval(loadMessages, 5000); // recharge toutes les 5 sec
+    setInterval(loadMessages, 5000);
   </script>
 </body>
 </html>
